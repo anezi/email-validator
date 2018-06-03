@@ -34,7 +34,7 @@ stages:
     untracked: true
 
 test 7.1 lowest:
-  image: registry.anezi.net/images/php-dev:7.1
+  image: registry.gitlab.com/anezi/php-dev:7.1
   variables:
     DEPS: "lowest"
     PHPMD: "1"
@@ -45,7 +45,7 @@ test 7.1 lowest:
       - phpmd.html
 
 test 7.1 latest:
-  image: registry.anezi.net/images/php-dev:7.1
+  image: registry.gitlab.com/anezi/php-dev:7.1
   variables:
     DEPS: "latest"
     PHPMD: "0"
@@ -55,6 +55,22 @@ test 7.1 latest:
     paths:
       - coverage
 
+test 7.2 lowest:
+  image: registry.gitlab.com/anezi/php-dev:7.2
+  variables:
+    DEPS: "lowest"
+    PHPMD: "0"
+    COVERAGE: "0"
+  <<: *test
+
+test 7.2 latest:
+  image: registry.gitlab.com/anezi/php-dev:7.2
+  variables:
+    DEPS: "latest"
+    PHPMD: "0"
+    COVERAGE: "0"
+  <<: *test
+
 pages:
   image: alpine:latest
   stage: deploy
@@ -62,7 +78,7 @@ pages:
     - mkdir public
     - mv coverage public/
     - mv phpmd.html public/
-    - echo "Visit https://packages.pages.anezi.net/locale to verify the results."
+    - echo "Visit https://packages.pages.gitlab.com/locale to verify the results."
   artifacts:
     paths:
       - public
@@ -70,11 +86,11 @@ pages:
     - master
 
 .trigger_build: &trigger_build
-  image: registry.anezi.net/images/curl
+  image: registry.gitlab.com/images/curl
   stage: deploy
   script:
     - PROJECT=`echo $PROJECT | sed -e "s/\//%2F/g"`
-    - curl -X POST -F token=$TOKEN -F ref=$REF https://git.anezi.net/api/v4/projects/$PROJECT/trigger/pipeline
+    - curl -X POST -F token=$TOKEN -F ref=$REF https://git.gitlab.com/api/v4/projects/$PROJECT/trigger/pipeline
 
 trigger_build:
   variables:
