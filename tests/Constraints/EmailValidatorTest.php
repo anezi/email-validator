@@ -12,9 +12,9 @@ use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class EmailValidatorTest extends TestCase
 {
@@ -137,11 +137,10 @@ class EmailValidatorTest extends TestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @expectedException UnexpectedTypeException
-     */
     public function testExpectsStringCompatibleType(): void
     {
+        $this->expectException(UnexpectedTypeException::class);
+
         $this->validator->validate('hassan@anezi.net', new Url());
     }
 
