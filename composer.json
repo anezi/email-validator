@@ -1,0 +1,21 @@
+{
+    "name": "anezi/email-validator",
+    "license": "MIT",
+    "require": {
+        "php": "^7.1",
+        "egulias/email-validator": "^1.2 | ^2.0",
+        "mattketmo/email-checker": "^0.1 | ^0.2 | ^0.3 | ^0.4 | ^1.0",
+        "symfony/validator": "^2.7 | ^3.0 | ^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Anezi\\Validator\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Anezi\\Validator\\Test\\": "tests/"
+        }
+    },
+    "minimum-stability": "beta"
+}
