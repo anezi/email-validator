@@ -1,102 +1,77 @@
 stages:
-  - test
-  - deploy
-
-.setup: &setup |
-  if [[ $COVERAGE == '1' ]] ;
-    then echo "zend_extension=xdebug.so" > /etc/php7/conf.d/xdebug.ini ;
-  fi
-  export COMPOSER_ARGS=''
-  if [[ $DEPS == 'lowest' ]]; then export COMPOSER_ARGS='--prefer-lowest --prefer-stable' ; fi
-  export PHPUNIT_ARGS=''
-  if [[ $COVERAGE == '1' ]]; then export PHPUNIT_ARGS='--coverage-text --coverage-html coverage' ; fi
-  composer update $COMPOSER_ARGS
-  composer show
-
-.test: &test
-  stage: test
-  script:
-    - *setup
-    - if [ ! -f phpunit ]; then
-        curl -o phpunit -L https://phar.phpunit.de/phpunit-7.phar ;
-        chmod +x phpunit ;
-      fi ;
-    - ./phpunit --configuration phpunit.xml.dist --colors=never $PHPUNIT_ARGS
-    - if [[ $PHPMD == '1' ]] ; then
-        if [ ! -f phpmd ]; then
-          curl -o phpmd -L http://static.phpmd.org/php/latest/phpmd.phar ;
-          chmod +x phpmd ;
-        fi ;
-        ./phpmd src text ruleset.xml --reportfile-html phpmd.html ;
-      fi
-  cache:
-    key: "$CI_JOB_NAME"
-    untracked: true
+    - test
+    - deploy
 
 test 7.1 lowest:
-  image: registry.gitlab.com/anezi/php-dev:7.1
-  variables:
-    DEPS: "lowest"
-    PHPMD: "1"
-    COVERAGE: "0"
-  <<: *test
-  artifacts:
-    paths:
-      - phpmd.html
+    image: registry.gitlab.com/anezi/php-dev:7.1
+    stage: test
+    script:
+        - ./tests.sh composer_update_prefer_lowest
+        - ./tests.sh phpunit
+        - ./tests.sh phpmd
+    artifacts:
+        paths:
+            - phpmd.html
+    cache:
+        key: "$CI_JOB_NAME"
+        untracked: true
 
 test 7.1 latest:
-  image: registry.gitlab.com/anezi/php-dev:7.1
-  variables:
-    DEPS: "latest"
-    PHPMD: "0"
-    COVERAGE: "1"
-  <<: *test
-  artifacts:
-    paths:
-      - coverage
+    image: registry.gitlab.com/anezi/php-dev:7.1
+    stage: test
+    script:
+        - ./tests.sh composer_update_prefer_latest
+        - ./tests.sh phpunit_with_coverage
+    artifacts:
+        paths:
+            - coverage
+    cache:
+        key: "$CI_JOB_NAME"
+        untracked: true
 
 test 7.2 lowest:
-  image: registry.gitlab.com/anezi/php-dev:7.2
-  variables:
-    DEPS: "lowest"
-    PHPMD: "0"
-    COVERAGE: "0"
-  <<: *test
+    image: registry.gitlab.com/anezi/php-dev:7.2
+    stage: test
+    script:
+        - ./tests.sh composer_update_prefer_lowest
+        - ./tests.sh phpunit
+    cache:
+        key: "$CI_JOB_NAME"
+        untracked: true
 
 test 7.2 latest:
-  image: registry.gitlab.com/anezi/php-dev:7.2
-  variables:
-    DEPS: "latest"
-    PHPMD: "0"
-    COVERAGE: "0"
-  <<: *test
+    image: registry.gitlab.com/anezi/php-dev:7.2
+    stage: test
+    script:
+        - ./tests.sh composer_update_prefer_latest
+        - ./tests.sh phpunit
+    cache:
+        key: "$CI_JOB_NAME"
+        untracked: true
 
 pages:
-  image: alpine:latest
-  stage: deploy
-  script:
-    - mkdir public
-    - mv coverage public/
-    - mv phpmd.html public/
-    - echo "Visit https://packages.pages.gitlab.com/locale to verify the results."
-  artifacts:
-    paths:
-      - public
-  only:
-    - master
-
-.trigger_build: &trigger_build
-  image: registry.gitlab.com/images/curl
-  stage: deploy
-  script:
-    - PROJECT=`echo $PROJECT | sed -e "s/\//%2F/g"`
-    - curl -X POST -F token=$TOKEN -F ref=$REF https://git.gitlab.com/api/v4/projects/$PROJECT/trigger/pipeline
+    image: alpine:latest
+    stage: deploy
+    script:
+        - mkdir public
+        - mv coverage public/
+        - mv phpmd.html public/
+        - echo "Visit https://packages.pages.gitlab.com/locale to verify the results."
+    artifacts:
+        paths:
+            - public
+    only:
+        - master
 
 trigger_build:
-  variables:
-    PROJECT: "packages/list"
-    REF: "master"
-    TOKEN: "e797ae6146398ae510ef0ea9169dc2"
-  <<: *trigger_build
-  only:
-    - tags
+    image: registry.gitlab.com/images/curl
+    stage: deploy
+    variables:
+        PROJECT: "packages/list"
+        REF: "master"
+        TOKEN: "e797ae6146398ae510ef0ea9169dc2"
+    script:
+        - PROJECT=`echo $PROJECT | sed -e "s/\//%2F/g"`
+        - curl -X POST -F token=$TOKEN -F ref=$REF https://git.gitlab.com/api/v4/projects/$PROJECT/trigger/pipeline
+    only:
+        - tags
