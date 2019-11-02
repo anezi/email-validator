@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\EmailValidator as BaseEmailValidator;
 use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 /**
  * @author  Hassan Amouhzi <hassan@amouhzi.com>
@@ -63,7 +64,10 @@ class EmailValidator extends BaseEmailValidator
         $emailValidator = new EmailChecker(new BuiltInAdapter());
 
         if (!$emailValidator->isValid($value)) {
-            $this->context->buildViolation($constraint->message)
+            /** @var ConstraintViolationBuilderInterface $violation */
+            $violation = $this->context->buildViolation($constraint->message);
+
+            $violation
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Email::THROWAWAY_CHECK_FAILED_ERROR)
                 ->addViolation();

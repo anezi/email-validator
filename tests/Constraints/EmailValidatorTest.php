@@ -58,7 +58,7 @@ class EmailValidatorTest extends TestCase
 
     protected function createContext(): ExecutionContext
     {
-        if (class_exists('\Symfony\Component\Translation\TranslatorInterface')) {
+        if (interface_exists('\Symfony\Component\Translation\TranslatorInterface')) {
             $translatorInterface = '\Symfony\Component\Translation\TranslatorInterface';
         } else {
             $translatorInterface = '\Symfony\Contracts\Translation\TranslatorInterface';
