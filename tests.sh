@@ -17,14 +17,14 @@ phpunit () {
         export PHPUNIT_ARGS='--coverage-text --coverage-html coverage' ;
     fi ;
 
-    if [ ! -f phpunit ]; then
-            curl -o phpunit -L https://phar.phpunit.de/phpunit-7.phar ;
-            chmod +x phpunit ;
+    if [ ! -f phpunit.phar ]; then
+            curl -o phpunit.phar -L https://phar.phpunit.de/phpunit-7.phar ;
+            chmod +x phpunit.phar ;
     fi ;
 
-    ./phpunit --version ;
+    ./phpunit.phar --version ;
 
-    ./phpunit --configuration phpunit.xml.dist --colors=never ${PHPUNIT_ARGS}
+    ./phpunit.phar --configuration phpunit.xml.dist --colors=never ${PHPUNIT_ARGS}
 }
 
 phpmd () {
