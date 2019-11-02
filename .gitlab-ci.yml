@@ -75,8 +75,9 @@ pages:
     script:
         - mkdir public
         - mv coverage public/
+        - echo "Visit https://anezi.gitlab.io/email-validator/coverage/ to verify the results."
         - mv phpmd.html public/
-        - echo "Visit https://packages.pages.gitlab.com/locale to verify the results."
+        - echo "Visit https://anezi.gitlab.io/email-validator/phpmd.html to verify the results."
     artifacts:
         paths:
             - public
