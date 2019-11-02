@@ -35,9 +35,9 @@ class EmailValidator extends BaseEmailValidator
             throw new UnexpectedTypeException($constraint, Email::class);
         }
 
-        $oldCount = \count($this->context->getViolations());
+        $oldCount = count($this->context->getViolations());
         parent::validate($value, $constraint);
-        $newCount = \count($this->context->getViolations());
+        $newCount = count($this->context->getViolations());
 
         if (null === $constraint->checkThrowaway) {
             $constraint->checkThrowaway = $this->checkThrowaway;
