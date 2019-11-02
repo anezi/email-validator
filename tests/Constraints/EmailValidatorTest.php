@@ -11,7 +11,6 @@ use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -57,10 +56,15 @@ class EmailValidatorTest extends TestCase
         $this->setDefaultTimezone('UTC');
     }
 
-    protected function createContext()
+    protected function createContext(): ExecutionContext
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface $translator */
-        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        if (class_exists('\Symfony\Component\Translation\TranslatorInterface')) {
+            $translatorInterface = '\Symfony\Component\Translation\TranslatorInterface';
+        } else {
+            $translatorInterface = '\Symfony\Contracts\Translation\TranslatorInterface';
+        }
+
+        $translator = $this->getMockBuilder($translatorInterface)->getMock();
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ValidatorInterface $validator */
         $validator = $this->getMockBuilder(ValidatorInterface::class)->getMock();
@@ -72,10 +76,10 @@ class EmailValidatorTest extends TestCase
         $context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
         $context->setConstraint($this->constraint);
 
-        $validator->expects($this->any())
+        $validator
             ->method('inContext')
             ->with($context)
-            ->will($this->returnValue($contextualValidator));
+            ->willReturn($contextualValidator);
 
         return $context;
     }

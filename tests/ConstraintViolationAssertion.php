@@ -40,14 +40,14 @@ class ConstraintViolationAssertion
         $this->assertions = $assertions;
     }
 
-    public function setParameter($key, $value)
+    public function setParameter($key, $value): ConstraintViolationAssertion
     {
         $this->parameters[$key] = $value;
 
         return $this;
     }
 
-    public function setCode($code)
+    public function setCode($code): ConstraintViolationAssertion
     {
         $this->code = $code;
 
