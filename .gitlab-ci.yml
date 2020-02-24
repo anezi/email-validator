@@ -83,16 +83,3 @@ pages:
             - public
     only:
         - master
-
-#trigger_build:
-#    image: registry.gitlab.com/images/curl
-#    stage: deploy
-#    variables:
-#        PROJECT: "packages/list"
-#        REF: "master"
-#        TOKEN: "e797ae6146398ae510ef0ea9169dc2"
-#    script:
-#        - PROJECT=`echo $PROJECT | sed -e "s/\//%2F/g"`
-#        - curl -X POST -F token=$TOKEN -F ref=$REF https://git.gitlab.com/api/v4/projects/$PROJECT/trigger/pipeline
-#    only:
-#        - tags
